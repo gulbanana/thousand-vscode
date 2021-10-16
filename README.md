@@ -1,14 +1,14 @@
 [![build](https://github.com/gulbanana/thousand/actions/workflows/master.yml/badge.svg)](https://github.com/gulbanana/thousand/actions/workflows/master.yml) [![nuget](https://github.com/gulbanana/thousand/actions/workflows/release.yml/badge.svg)](https://github.com/gulbanana/thousand/actions/workflows/release.yml)
 
-thousand words
+Thousand Words
 ==============
 
-Visual Studio Code extension for .1000 files - a language for generating attractive, maintainable diagrams.
+Visual Studio Code extension for _thousand words_ - a system for generating attractive, maintainable diagrams.
 
 Features
 --------
 
-None yet.
+This extension provides syntax highlighting for the `.1000` language
 
 Further information
 -------------------

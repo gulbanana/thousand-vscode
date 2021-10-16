@@ -1,13 +1,18 @@
 {
 	"name": "thousand",
-	"displayName": "Thousand",
+	"displayName": "Thousand Words",
 	"description": "Language support for thousand words (.1000 files) in Visual Studio Code.",
 	"version": "0.0.1",
 	"publisher": "gulbanana",
+	"license": "GPL-3.0-or-later",
 	"repository": {
 		"type": "git",
-		 "url": "https://github.com/gulbanana/thousand-vscode"
+		"url": "https://github.com/gulbanana/thousand-vscode"
 	},
+	"categories": [
+		"Programming Languages",
+		"Visualization"
+	],
 	"devDependencies": {
 		"@types/vscode": "^1.61.0",
 		"@types/glob": "^7.1.4",
@@ -29,17 +34,30 @@
 	"engines": {
 		"vscode": "^1.61.0"
 	},
-	"categories": [
-		"Other"
-	],
 	"activationEvents": [
-		"onCommand:thousand.preview"
+		"onCommand:thousand.preview",
+		"onLanguage:thousand"
 	],
 	"contributes": {
 		"commands": [
 			{
 				"command": "thousand.preview",
 				"title": "Thousand: Open Preview to the Side"
+			}
+		],
+		"languages": [
+			{
+				"id": "thousand",
+				"extensions": [".1000"],
+				"aliases": ["Thousand Words"],
+				"configuration": "src/thousand.language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "thousand",
+				"scopeName": "source.thousand",
+				"path": "src/thousand.tmGrammar.json"
 			}
 		]
 	}

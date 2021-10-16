@@ -1,0 +1,40 @@
+{
+    "scopeName": "source.thousand",
+    "patterns": [
+        { "include": "#comment" },
+        { "include": "#string" },
+        { "include": "#keyword" },
+        { "include": "#identifier" },
+        { "include": "#arrow" },
+        { "include": "#literal" }
+    ],
+    "repository": {
+      "comment": {
+        "name": "comment.line.double-slash",
+        "begin": "//",
+        "end": "$"
+      },
+      "string": {
+        "name": "string",
+        "begin": "\"",
+        "end": "\"",
+        "patterns": [
+          { "name": "constant.character.escape", "match": "\\." }
+        ]
+      },
+      "identifier": { 
+        "patterns": [
+          {"match": "\\$[A-Za-z][A-Za-z0-9]*(\\-[A-Za-z0-9]*)*", "name": "variable.css"},
+          {"match": "[A-Za-z][A-Za-z0-9]*(\\-[A-Za-z0-9]*)*", "name": "identifier"}
+        ]
+      },
+      "keyword": { "match": "class|none", "name": "keyword" },
+      "arrow": { "match": "--*-|<-*-|--*>|<-*>", "name": "constant.language" },
+      "literal": {
+        "patterns": [
+          { "match": "#[0-9A-Fa-f]{3}([0-9A-Fa-f]{3})?", "name": "constant.other.color.rgb-value" },
+          { "match": "\\d*\\.\\d+([eE][\\-+]?\\d+)?", "name": "constant.numeric" }
+        ]			
+      }
+    }
+  }
