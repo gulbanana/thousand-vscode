@@ -13,6 +13,9 @@
 		"Programming Languages",
 		"Visualization"
 	],
+	"extensionDependencies": [
+		"ms-dotnettools.vscode-dotnet-runtime"
+	],
 	"devDependencies": {
 		"@types/vscode": "^1.61.0",
 		"@types/glob": "^7.1.4",
@@ -42,14 +45,18 @@
 		"commands": [
 			{
 				"command": "thousand.preview",
-				"title": "Thousand: Open Preview to the Side"
+				"title": "Thousand Words: Open Preview to the Side"
 			}
 		],
 		"languages": [
 			{
 				"id": "thousand",
-				"extensions": [".1000"],
-				"aliases": ["Thousand Words"],
+				"extensions": [
+					".1000"
+				],
+				"aliases": [
+					"Thousand Words"
+				],
 				"configuration": "thousand.language-configuration.json"
 			}
 		],
