@@ -33,6 +33,7 @@
       "literal": {
         "patterns": [
           { "match": "#[0-9A-Fa-f]{3}([0-9A-Fa-f]{3})?", "name": "constant.other.color.rgb-value" },
+          { "match": "\\-?\\d+", "name": "constant.numeric" },
           { "match": "\\d*\\.\\d+([eE][\\-+]?\\d+)?", "name": "constant.numeric" }
         ]			
       }
