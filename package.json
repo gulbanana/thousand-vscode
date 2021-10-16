@@ -2,7 +2,7 @@
 	"name": "thousand",
 	"displayName": "Thousand Words",
 	"description": "Language support for thousand words (.1000 files) in Visual Studio Code.",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"publisher": "gulbanana",
 	"license": "GPL-3.0-or-later",
 	"repository": {
@@ -50,14 +50,14 @@
 				"id": "thousand",
 				"extensions": [".1000"],
 				"aliases": ["Thousand Words"],
-				"configuration": "src/thousand.language-configuration.json"
+				"configuration": "thousand.language-configuration.json"
 			}
 		],
 		"grammars": [
 			{
 				"language": "thousand",
 				"scopeName": "source.thousand",
-				"path": "src/thousand.tmGrammar.json"
+				"path": "thousand.tmGrammar.json"
 			}
 		]
 	}
