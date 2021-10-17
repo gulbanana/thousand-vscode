@@ -1,6 +1,6 @@
 {
 	"name": "thousand",
-	"version": "0.1.2",
+	"version": "0.2.1",
 	"publisher": "gulbanana",
 	"license": "GPL-3.0-or-later",
 	"displayName": "Thousand Words",
@@ -71,6 +71,18 @@
 					"type": "boolean",
 					"default": false,
 					"description": "Launches a debugger when the language server starts."
+				},
+				"thousand.client.serverPath": {
+					"scope": "window",
+					"type": "string",
+					"default": "thousand-server",
+					"description": "Override the default language server with your own copy."
+				},
+				"thousand.client.serverType": {
+					"scope": "window",
+					"type": "string",
+					"default": "command",
+					"description": "project | assembly | command"
 				},
 				"thousand.server.dummy": {
 					"scope": "window",

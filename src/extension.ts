@@ -35,18 +35,21 @@ export async function activate(context: vscode.ExtensionContext) {
 		return;
 	}
 	
-	let serverPath = "C:\\Users\\banana\\Documents\\code\\thousand\\Thousand.LSP"; // XXX hardcoded! need to acquire this from nuget
-	if (fs.existsSync(serverPath)) {
+	// need to acquire this from nuget
+	let serverPath = vscode.workspace.getConfiguration("thousand.client").get("serverPath", "C:\\Users\\banana\\Documents\\code\\thousand\\Thousand.LSP"); 
+	let serverType = vscode.workspace.getConfiguration("thousand.client").get("serverType", "project");
+
+	if (serverType == "command" || fs.existsSync(serverPath)) {
 		let debugServer = vscode.workspace.getConfiguration("thousand.client").get("debugServer", false);
 		let extraArgs = debugServer ? ["launchDebugger"] : [];
 		let serverOptions: ServerOptions = {
 			run: { 
-				command: dotnetPath,
-				args: ["run", "-c", "Release", "-p", serverPath].concat(extraArgs)
+				command: serverType == "command" ? serverPath : dotnetPath,
+				args: (serverType == "project" ? (debugServer ? ["run", "-p", serverPath] : ["run", "-c", "Release", "-p", serverPath]) : []).concat(extraArgs)
 			},
 			debug: { 
-				command: dotnetPath,
-				args: ["run", "-p", serverPath].concat(extraArgs)
+				command: serverType == "command" ? serverPath : dotnetPath,
+				args: (serverType == "project" ? ["run", "-p", serverPath] : []).concat(extraArgs)
 			}
 		};
 
