@@ -24,14 +24,13 @@ interface IDotnetAcquireResult {
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-	let output = vscode.window.createOutputChannel("Thousand Words");
-
 	// activate language server
 	let acquisitionRequest: IDotnetAcquireContext =  { version: "5.0", requestingExtensionId: "gulbanana.thousand" };
 	let acquisitionResult = await vscode.commands.executeCommand<IDotnetAcquireResult>('dotnet.acquire', acquisitionRequest);
 
 	let dotnetPath = acquisitionResult!.dotnetPath;
 	if (!dotnetPath) {
+		let output = vscode.window.createOutputChannel("Thousand Words");
 		output.appendLine(".NET runtime installation failed.");
 		return;
 	}
@@ -41,9 +40,11 @@ export async function activate(context: vscode.ExtensionContext) {
 	let serverType = vscode.workspace.getConfiguration("thousand.client").get("serverType", "project");
 
 	if (serverType == "command" && !commandExists.sync(serverPath)) {
+		let output = vscode.window.createOutputChannel("Thousand Words");
 		output.appendLine("Language server not found. For more features, install https://www.nuget.org/packages/Thousand.LSP/");
 		return;
 	} else if (serverType != "command" && !fs.existsSync(serverPath)) {
+		let output = vscode.window.createOutputChannel("Thousand Words");
 		output.appendLine("Language server not found at " + serverPath);
 		return;
 	}
