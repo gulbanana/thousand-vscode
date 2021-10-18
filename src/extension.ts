@@ -1,5 +1,6 @@
-import * as vscode from 'vscode';
 import * as fs from 'fs';
+import * as commandExists from 'command-exists';
+import * as vscode from 'vscode';
 import {
 	LanguageClient,
 	LanguageClientOptions,
@@ -23,15 +24,15 @@ interface IDotnetAcquireResult {
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-	// activate language server
+	let output = vscode.window.createOutputChannel("Thousand Words");
 
+	// activate language server
 	let acquisitionRequest: IDotnetAcquireContext =  { version: "5.0", requestingExtensionId: "gulbanana.thousand" };
 	let acquisitionResult = await vscode.commands.executeCommand<IDotnetAcquireResult>('dotnet.acquire', acquisitionRequest);
 
 	let dotnetPath = acquisitionResult!.dotnetPath;
 	if (!dotnetPath) {
-		vscode.window.showErrorMessage(".NET runtime installation failed.");
-		await vscode.commands.executeCommand('dotnet.showAcquisitionLog');
+		output.appendLine(".NET runtime installation failed.");
 		return;
 	}
 	
@@ -39,35 +40,41 @@ export async function activate(context: vscode.ExtensionContext) {
 	let serverPath = vscode.workspace.getConfiguration("thousand.client").get("serverPath", "C:\\Users\\banana\\Documents\\code\\thousand\\Thousand.LSP"); 
 	let serverType = vscode.workspace.getConfiguration("thousand.client").get("serverType", "project");
 
-	if (serverType == "command" || fs.existsSync(serverPath)) {
-		let debugServer = vscode.workspace.getConfiguration("thousand.client").get("debugServer", false);
-		let extraArgs = debugServer ? ["launchDebugger"] : [];
-		let serverOptions: ServerOptions = {
-			run: { 
-				command: serverType == "command" ? serverPath : dotnetPath,
-				args: (serverType == "project" ? (debugServer ? ["run", "-p", serverPath] : ["run", "-c", "Release", "-p", serverPath]) : []).concat(extraArgs)
-			},
-			debug: { 
-				command: serverType == "command" ? serverPath : dotnetPath,
-				args: (serverType == "project" ? ["run", "-p", serverPath] : []).concat(extraArgs)
-			}
-		};
-
-		let clientOptions: LanguageClientOptions = {
-			documentSelector: [{ scheme: "file", language: "thousand" }]
-		};
-
-		let client = new LanguageClient(
-			"thousand",
-			"Thousand Words",
-			serverOptions,
-			clientOptions
-		);
-
-		context.subscriptions.push(client.start());
+	if (serverType == "command" && !commandExists.sync(serverPath)) {
+		output.appendLine("Language server not found. For more features, install https://www.nuget.org/packages/Thousand.LSP/");
+		return;
+	} else if (serverType != "command" && !fs.existsSync(serverPath)) {
+		output.appendLine("Language server not found at " + serverPath);
+		return;
 	}
+	
+	let debugServer = vscode.workspace.getConfiguration("thousand.client").get("debugServer", false);
+	let extraArgs = debugServer ? ["launchDebugger"] : [];
+	let serverOptions: ServerOptions = {
+		run: { 
+			command: serverType == "command" ? serverPath : dotnetPath,
+			args: (serverType == "project" ? (debugServer ? ["run", "-p", serverPath] : ["run", "-c", "Release", "-p", serverPath]) : []).concat(extraArgs)
+		},
+		debug: { 
+			command: serverType == "command" ? serverPath : dotnetPath,
+			args: (serverType == "project" ? ["run", "-p", serverPath] : []).concat(extraArgs)
+		}
+	};
 
-	// register commands	
+	let clientOptions: LanguageClientOptions = {
+		documentSelector: [{ scheme: "file", language: "thousand" }]
+	};
+
+	let client = new LanguageClient(
+		"thousand",
+		"Thousand Words",
+		serverOptions,
+		clientOptions
+	);
+
+	context.subscriptions.push(client.start());
+
+	// register LSP-dependent commands	
 	context.subscriptions.push(vscode.commands.registerCommand('thousand.preview', async () => {
 		let installDirectory = vscode.extensions.getExtension("gulbanana.thousand");
 		if (!installDirectory) {
@@ -75,7 +82,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 
-		vscode.window.showInformationMessage("not implemented");
+		vscode.window.showErrorMessage("not yet implemented");
 	}));
 }
 
