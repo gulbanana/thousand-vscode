@@ -1,6 +1,6 @@
 {
 	"name": "thousand",
-	"version": "0.2.3",
+	"version": "0.3.0",
 	"publisher": "gulbanana",
 	"license": "GPL-3.0-or-later",
 	"displayName": "Thousand Words",
@@ -50,12 +50,6 @@
 		"onLanguage:thousand"
 	],
 	"contributes": {
-		"commands": [
-			{
-				"command": "thousand.preview",
-				"title": "Thousand Words: Open Preview to the Side"
-			}
-		],
 		"configuration": {
 			"type": "object",
 			"title": "Thousand Words",
@@ -89,11 +83,11 @@
 					"default": "command",
 					"description": "project | assembly | command"
 				},
-				"thousand.server.dummy": {
-					"scope": "window",
-					"type": "string",
-					"default": "foobar",
-					"description": "Test setting for server-side config."
+				"thousand.server.previewDiagrams": {
+					"scope": "document",
+					"type": "boolean",
+					"default": true,
+					"description": "If true, the language server will generate previews and open them in a tab."
 				}
 			}
 		},

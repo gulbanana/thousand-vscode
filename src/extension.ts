@@ -7,6 +7,8 @@ import {
 	ServerOptions,
 	Trace
   } from 'vscode-languageclient/node';
+import path = require('path');
+import Preview from './Preview';
 
 enum AcquireErrorConfiguration {
     DisplayAllErrorPopups = 0,
@@ -75,16 +77,22 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(client.start());
 
-	// register LSP-dependent commands	
-	context.subscriptions.push(vscode.commands.registerCommand('thousand.preview', async () => {
-		let installDirectory = vscode.extensions.getExtension("gulbanana.thousand");
-		if (!installDirectory) {
-			vscode.window.showErrorMessage("Could not find installation location.");
-			return;
-		}
-
-		vscode.window.showErrorMessage("not yet implemented");
-	}));
+	client.onReady().then(() => {
+		let previews = new Map<vscode.Uri, Preview>();
+		client.onNotification("thousand/updatePreview", ({uri, filename}: { uri: vscode.Uri, filename: string }) => {			
+			let preview = previews.get(uri);
+			if (preview) {
+				preview.reveal();
+			} else {
+				preview = new Preview(filename, () => {
+					previews.delete(uri);
+				});
+				previews.set(uri, preview);
+			}
+			
+			preview.setFilename(filename);
+		})
+	});
 }
 
 export function deactivate() {}
