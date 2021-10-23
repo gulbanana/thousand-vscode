@@ -6,9 +6,10 @@ import {
 	LanguageClientOptions,
 	ServerOptions,
 	Trace
-  } from 'vscode-languageclient/node';
+} from 'vscode-languageclient/node';
 import path = require('path');
 import Preview from './Preview';
+import VFSProvider from './VFSProvider';
 
 enum AcquireErrorConfiguration {
     DisplayAllErrorPopups = 0,
@@ -76,6 +77,9 @@ export async function activate(context: vscode.ExtensionContext) {
 	);
 
 	context.subscriptions.push(client.start());
+
+		// register stdlib provider
+		context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider("thousand", new VFSProvider(client)));
 
 	client.onReady().then(() => {
 		let previews = new Map<vscode.Uri, Preview>();
