@@ -1,6 +1,6 @@
 {
 	"name": "thousand",
-	"version": "0.3.0",
+	"version": "0.3.1",
 	"publisher": "gulbanana",
 	"license": "GPL-3.0-or-later",
 	"displayName": "Thousand Words",
@@ -88,6 +88,18 @@
 					"type": "boolean",
 					"default": true,
 					"description": "If true, the language server will generate previews and open them in a tab."
+				},
+				"thousand.server.generatePNG": {
+					"scope": "document",
+					"type": "boolean",
+					"default": false,
+					"description": "If true, the language server will generate PNG instead of SVG previews (slow!)."
+				},
+				"thousand.server.noStandardLibrary": {
+					"scope": "document",
+					"type": "boolean",
+					"default": false,
+					"description": "Disable built-in classes (label, row, etc)."
 				}
 			}
 		},
