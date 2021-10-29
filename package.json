@@ -103,6 +103,11 @@
 				}
 			}
 		},
+		"configurationDefaults": {
+			"[thousand]": {
+				"editor.wordBasedSuggestions": false
+			}
+		},
 		"languages": [
 			{
 				"id": "thousand",
