@@ -11,7 +11,7 @@ interface BeginEndParams {
 	uri: string;
 }
 
-export async function initPreviewPane(context: vscode.ExtensionContext, client: LanguageClient): Promise<void> {
+export async function initPreviewPane(context: vscode.ExtensionContext, client: LanguageClient, previewCommand: vscode.Disposable): Promise<void> {
     let previews = new Map<string, Preview>();
     let activePreview : Preview | undefined;
     let beginPreview = new NotificationType<BeginEndParams>("thousand/beginPreview");
@@ -75,4 +75,13 @@ export async function initPreviewPane(context: vscode.ExtensionContext, client: 
             client.sendNotification(beginPreview, {uri: editor.document.uri.toString()});
         }
     }
+
+    // add a command to open previews explicitly
+    previewCommand.dispose();
+    context.subscriptions.push(vscode.commands.registerCommand("thousand.beginPreview", () => {
+        let doc = vscode.window.activeTextEditor?.document;
+        if (doc?.languageId == "thousand") {
+            client.sendNotification(beginPreview, {uri: doc.uri.toString()});
+        }
+    }));
 }
