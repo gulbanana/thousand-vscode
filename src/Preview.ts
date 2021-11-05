@@ -28,4 +28,8 @@ export default class Preview {
     reveal() {
         this.panel.reveal(vscode.ViewColumn.Beside, true);
     }
+
+    dispose() {
+        this.panel.dispose();
+    }
 }
