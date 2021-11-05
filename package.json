@@ -89,11 +89,11 @@
 					"default": "command",
 					"description": "project | assembly | command"
 				},
-				"thousand.server.previewDiagrams": {
+				"thousand.client.automaticPreview": {
 					"scope": "document",
 					"type": "boolean",
 					"default": true,
-					"description": "If true, the language server will generate previews and open them in a tab."
+					"description": "Open previews immediately when a .1000 file is loaded.."
 				},
 				"thousand.server.generatePNG": {
 					"scope": "document",

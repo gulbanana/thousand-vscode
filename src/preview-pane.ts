@@ -40,7 +40,7 @@ export async function initPreviewPane(context: vscode.ExtensionContext, client: 
 
     // when a document is added to the workspace, begin previewing it
     context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(doc => {
-        if (doc.languageId == "thousand") {
+        if (doc.languageId == "thousand" && vscode.workspace.getConfiguration("thousand.client").get("automaticPreview", true)) {
             let preview = previews.get(doc.uri.fsPath);
             if (!preview) {
                 client.sendNotification(beginPreview, {uri: doc.uri.toString()});
@@ -69,12 +69,6 @@ export async function initPreviewPane(context: vscode.ExtensionContext, client: 
         }
     }));
 
-    // upon load of the LSP, open previews for existing documents
-    for (let editor of vscode.window.visibleTextEditors) {
-        if (editor.document.languageId == "thousand") {
-            client.sendNotification(beginPreview, {uri: editor.document.uri.toString()});
-        }
-    }
 
     // add a command to open previews explicitly
     previewCommand.dispose();
@@ -84,4 +78,13 @@ export async function initPreviewPane(context: vscode.ExtensionContext, client: 
             client.sendNotification(beginPreview, {uri: doc.uri.toString()});
         }
     }));
+
+    // upon load of the LSP, open previews for existing documents
+    if (vscode.workspace.getConfiguration("thousand.client").get("automaticPreview", true)) {
+        for (let editor of vscode.window.visibleTextEditors) {
+            if (editor.document.languageId == "thousand") {
+                client.sendNotification(beginPreview, {uri: editor.document.uri.toString()});
+            }
+        }
+    }
 }
