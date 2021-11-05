@@ -8,7 +8,7 @@ Visual Studio Code extension for _thousand words_ - a system for generating attr
 Features
 --------
 
-This extension provides syntax highlighting for the `.1000` language
+Language server integration and live previews for the `.1000` language. Requires https://www.nuget.org/packages/Thousand.LSP/
 
 Further information
 -------------------

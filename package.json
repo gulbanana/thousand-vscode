@@ -1,10 +1,11 @@
 {
 	"name": "thousand",
-	"version": "0.5.0",
+	"version": "0.5.1",
 	"publisher": "gulbanana",
 	"license": "GPL-3.0-or-later",
 	"displayName": "Thousand Words",
 	"description": "Language support for thousand words (.1000 files) in VS Code.",
+	"icon": "res/fdam.png",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/gulbanana/thousand-vscode"
