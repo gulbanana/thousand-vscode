@@ -23,7 +23,9 @@ export async function initPreviewPane(context: vscode.ExtensionContext, client: 
         let parsedUri = vscode.Uri.parse(uri, true);        
 
         let preview = previews.get(parsedUri.fsPath);
-        if (!preview) {
+        if (preview) {
+            preview.update(filename);
+        } else {
             preview = new Preview(parsedUri, filename, () => {
                 client.sendNotification(endPreview, {uri: parsedUri.toString()});
                 previews.delete(parsedUri.fsPath);
@@ -35,9 +37,12 @@ export async function initPreviewPane(context: vscode.ExtensionContext, client: 
             if (!activePreview) {
                 activePreview = preview;
             }
-        }
-        
-        preview.update(filename);
+
+            preview.update(filename);
+            if (vscode.workspace.getConfiguration("thousand.client").get("highlightSelection", true)) {
+                preview.selectInitial();
+            }
+        } 
     });
 
     // when a document is added to the workspace, begin previewing it
@@ -71,14 +76,30 @@ export async function initPreviewPane(context: vscode.ExtensionContext, client: 
         }
     }));
 
-    vscode.window.onDidChangeTextEditorSelection(async e => {
+    // when repositioning the cursor, find what symbol it's in and highlight the preview
+    context.subscriptions.push(vscode.window.onDidChangeTextEditorSelection(async e => {
         if (e.textEditor.document.languageId == "thousand" && vscode.workspace.getConfiguration("thousand.client").get("highlightSelection", true)) {
             let preview = previews.get(e.textEditor.document.uri.fsPath);
             if (preview) {
                 await preview.select(e.textEditor.selection.active);
             }
         }
-    });
+    }));
+
+    // disable all highlighting when it's turned off
+    context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(e => {
+        if (e.affectsConfiguration("thousand.client")) {
+            if (vscode.workspace.getConfiguration("thousand.client").get("highlightSelection", true)) {
+                for (let preview of previews.values()) {
+                    preview.selectInitial();
+                }
+            } else {
+                for (let preview of previews.values()) {
+                    preview.deselect();
+                }
+            }
+        }
+    }));
 
     // add a command to open previews explicitly
     previewCommand.dispose();

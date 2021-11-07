@@ -2,13 +2,18 @@ import { readFileSync } from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
+interface SymbolResult {
+    symbol: vscode.DocumentSymbol;
+    path: number[];
+}
+
 export default class Preview {
     uri: vscode.Uri;
     panel: vscode.WebviewPanel;
     
     seq: number;
     highlightClass: string | null;
-    lastSymbol: vscode.DocumentSymbol | null;
+    lastResult: SymbolResult | null;
 
     body: string;
     
@@ -18,7 +23,7 @@ export default class Preview {
 
         this.seq = 0;
         this.highlightClass = null;
-        this.lastSymbol = null;
+        this.lastResult = null;
 
         this.body = "<body></body>";
 
@@ -51,17 +56,23 @@ export default class Preview {
 
     async select(pos: vscode.Position) {
         let tree = await vscode.commands.executeCommand("vscode.executeDocumentSymbolProvider", this.uri) as vscode.DocumentSymbol[];
-        let symbol = findSymbol(tree, pos);
+        let result = findSymbol(tree, pos, []);
 
-        if (symbol?.name != this.lastSymbol?.name) {
-            this.lastSymbol = symbol;
+        if (result?.symbol?.name != this.lastResult?.symbol?.name) {
+            this.lastResult = result;
 
             this.highlightClass = null;
-            if (symbol != null) {
-                switch (symbol.kind)
+            if (result != null) {
+                switch (result.symbol.kind)
                 {
                     case vscode.SymbolKind.Class:
-                        this.highlightClass = symbol.name.slice(6);
+                        this.highlightClass = `C_${result.symbol.name}`;
+                        break;
+
+                    case vscode.SymbolKind.Variable:
+                        if (!result.symbol.name.startsWith("diagram")) {
+                            this.highlightClass = `O_${result.path.join("_")}`;
+                        }
                         break;
                 }
             }    
@@ -70,9 +81,33 @@ export default class Preview {
         }
     }
 
+    selectInitial() {
+        let editor = vscode.window.visibleTextEditors.find(e => e.document.uri.fsPath == this.uri.fsPath);
+        if (editor) {
+            this.select(editor.selection.active);
+        }
+    }
+
+    deselect() {
+        this.lastResult = null;
+        this.highlightClass = null;
+        this.updateImpl();
+    }
+
     private updateImpl() {
-        let style = this.highlightClass == null ? "" : `<style type="text/css">.${this.highlightClass} { filter: contrast(0.5); } .${this.highlightClass}[fill-opacity] { fill-opacity: 0.25; }</style>`;
-        this.panel.webview.html = `<html><head><title>${this.uri.path} ${this.seq++}</title>${style}</head>${this.body}</html>`;
+        let style = this.highlightClass == null ? "" : `<style type="text/css">
+    .${this.highlightClass} { 
+        filter: contrast(0.5); 
+    } 
+    .${this.highlightClass}[fill-opacity] { 
+        fill-opacity: 0.25; 
+    }
+</style>`;
+
+        this.panel.webview.html = `<html>
+<head><title>${this.uri.path} ${this.seq++}</title>${style}</head>
+${this.body}
+</html>`;
     }
 
     dispose() {
@@ -80,10 +115,15 @@ export default class Preview {
     }
 }
 
-function findSymbol(tree: vscode.DocumentSymbol[], pos: vscode.Position) : vscode.DocumentSymbol | null {
-    for (let sym of tree) {
-        if (sym.range.contains(pos)) {
-            return findSymbol(sym.children, pos) ?? sym;
+function findSymbol(tree: vscode.DocumentSymbol[], pos: vscode.Position, prefix: number[]) : SymbolResult | null {
+    let idx = 0;
+    for (let symbol of tree) {
+        if (symbol.range.contains(pos)) {
+            let path = prefix.concat([idx]);
+            return findSymbol(symbol.children, pos, path) ?? {symbol, path};
+        }
+        if (symbol.kind == vscode.SymbolKind.Variable) {
+            idx++;
         }
     }
     return null;
