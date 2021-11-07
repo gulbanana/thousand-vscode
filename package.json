@@ -1,6 +1,6 @@
 {
 	"name": "thousand",
-	"version": "0.5.1",
+	"version": "0.5.2",
 	"publisher": "gulbanana",
 	"license": "GPL-3.0-or-later",
 	"displayName": "Thousand Words",
@@ -95,6 +95,12 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Open previews immediately when a .1000 file is loaded.."
+				},
+				"thousand.client.highlightSelection": {
+					"scope": "document",
+					"type": "boolean",
+					"default": true,
+					"description": "When using SVG previews, highlight the section of the diagram corresponding to the cursor position."
 				},
 				"thousand.server.generatePNG": {
 					"scope": "document",

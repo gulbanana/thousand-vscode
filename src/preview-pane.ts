@@ -23,19 +23,21 @@ export async function initPreviewPane(context: vscode.ExtensionContext, client: 
         let parsedUri = vscode.Uri.parse(uri, true);        
 
         let preview = previews.get(parsedUri.fsPath);
-        if (preview) {
-            if (preview == activePreview) {
-                preview.reveal();
-            }
-        } else {
-            preview = new Preview(filename, () => {
+        if (!preview) {
+            preview = new Preview(parsedUri, filename, () => {
                 client.sendNotification(endPreview, {uri: parsedUri.toString()});
                 previews.delete(parsedUri.fsPath);
+                if (preview == activePreview) {
+                    activePreview = undefined;
+                }
             });
             previews.set(parsedUri.fsPath, preview);
+            if (!activePreview) {
+                activePreview = preview;
+            }
         }
         
-        preview.setFilename(filename);
+        preview.update(filename);
     });
 
     // when a document is added to the workspace, begin previewing it
@@ -69,6 +71,14 @@ export async function initPreviewPane(context: vscode.ExtensionContext, client: 
         }
     }));
 
+    vscode.window.onDidChangeTextEditorSelection(async e => {
+        if (e.textEditor.document.languageId == "thousand" && vscode.workspace.getConfiguration("thousand.client").get("highlightSelection", true)) {
+            let preview = previews.get(e.textEditor.document.uri.fsPath);
+            if (preview) {
+                await preview.select(e.textEditor.selection.active);
+            }
+        }
+    });
 
     // add a command to open previews explicitly
     previewCommand.dispose();
