@@ -7,6 +7,8 @@ import {
 	ServerOptions
 } from 'vscode-languageclient/node';
 import VFSProvider from './VFSProvider';
+import { exec, execFile } from 'child_process';
+import { stderr } from 'process';
 
 enum AcquireErrorConfiguration {
     DisplayAllErrorPopups = 0,
@@ -34,6 +36,17 @@ export async function initLanguageService(context: vscode.ExtensionContext): Pro
 		output.appendLine(".NET runtime installation failed.");
 		return null;
 	}
+
+	let output = await new Promise<string>((resolve, reject) => {
+		execFile(dotnetPath, [context.asAbsolutePath("out/tool/download-server.dll")], (error, stdout, _stderr) => {
+			if (error == null) {
+				resolve(stdout);
+			} else {
+				reject(error);
+			}
+		});
+	});
+	vscode.window.showInformationMessage(output);
 	
 	// need to acquire this from nuget
 	let serverPath = vscode.workspace.getConfiguration("thousand.client").get("serverPath", "C:\\Users\\banana\\Documents\\code\\thousand\\Thousand.LSP"); 

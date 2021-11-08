@@ -35,7 +35,7 @@
 	],
 	"scripts": {
 		"vscode:prepublish": "npm run esbuild-base -- --minify",
-		"esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+		"esbuild-base": "dotnet publish -o out/tool src/tool && esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
 		"compile": "npm run esbuild-base -- --sourcemap",
 		"watch": "tsc -watch -p ./",
 		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",

@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>download-server</AssemblyName>
+    <UseAppHost>false</UseAppHost>
+  </PropertyGroup>
+</Project>
