@@ -1,6 +1,6 @@
 {
 	"name": "thousand",
-	"version": "0.5.2",
+	"version": "0.5.3",
 	"publisher": "gulbanana",
 	"license": "GPL-3.0-or-later",
 	"displayName": "Thousand Words",
@@ -87,8 +87,8 @@
 				"thousand.client.serverType": {
 					"scope": "window",
 					"type": "string",
-					"default": "command",
-					"description": "project | assembly | command"
+					"default": "internal",
+					"description": "internal | project | assembly | command"
 				},
 				"thousand.client.automaticPreview": {
 					"scope": "document",
