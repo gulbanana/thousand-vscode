@@ -5,4 +5,8 @@
     <AssemblyName>download-server</AssemblyName>
     <UseAppHost>false</UseAppHost>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="NuGet.Protocol" Version="5.11.0" />
+  </ItemGroup>
 </Project>

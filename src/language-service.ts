@@ -42,8 +42,11 @@ export async function initLanguageService(context: vscode.ExtensionContext, outp
 	// acquire Thousand.LSP
 	if (serverType == "internal") {
 		serverType = "assembly";
-		let download = await new Promise<string>((resolve, reject) => {
-			execFile(dotnetPath, [context.asAbsolutePath("out/tool/download-server.dll")], (error, stdout, _stderr) => {
+
+		vscode.workspace.fs.createDirectory(context.globalStorageUri);
+		let args = [context.asAbsolutePath("out/tool/download-server.dll"), context.globalStorageUri.fsPath];
+		let downloadResult = await new Promise<string>((resolve, reject) => {
+			execFile(dotnetPath, args, (error, stdout, _stderr) => {
 				if (error == null) {
 					resolve(stdout);
 				} else {
@@ -51,7 +54,7 @@ export async function initLanguageService(context: vscode.ExtensionContext, outp
 				}
 			});
 		});
-		output.append(download); // XXX don't batch this
+		output.append(downloadResult); // XXX don't batch this
 	} 
 	
 	// check prerequisites
