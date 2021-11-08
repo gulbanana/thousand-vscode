@@ -46,7 +46,8 @@ export async function initLanguageService(context: vscode.ExtensionContext, outp
 		vscode.workspace.fs.createDirectory(context.globalStorageUri);
 		let args = [context.asAbsolutePath("out/tool/download-server.dll"), context.globalStorageUri.fsPath];
 		let downloadResult = await new Promise<string>((resolve, reject) => {
-			execFile(dotnetPath, args, (error, stdout, _stderr) => {
+			execFile(dotnetPath, args, (error, stdout, stderr) => {
+				output.append(stderr); // XXX don't batch this
 				if (error == null) {
 					resolve(stdout);
 				} else {
@@ -54,7 +55,7 @@ export async function initLanguageService(context: vscode.ExtensionContext, outp
 				}
 			});
 		});
-		output.append(downloadResult); // XXX don't batch this
+		serverPath = downloadResult;
 	} 
 	
 	// check prerequisites
@@ -67,11 +68,17 @@ export async function initLanguageService(context: vscode.ExtensionContext, outp
 	}
 	
 	let debugServer = vscode.workspace.getConfiguration("thousand.client").get("debugServer", false);
-	let extraArgs = debugServer ? ["launchDebugger"] : [];
+	let extraArgs = [];
+	if (serverType != "command") {
+		extraArgs.push(serverPath);
+	}
+	if (debugServer) {
+		extraArgs.push("launchDebugger");
+	}
 	let serverOptions: ServerOptions = {
 		run: { 
 			command: serverType == "command" ? serverPath : dotnetPath,
-			args: (serverType == "project" ? (debugServer ? ["run", "-p", serverPath] : ["run", "-c", "Release", "-p", serverPath]) : []).concat(extraArgs)
+			args: (serverType == "project" ? (debugServer ? ["run", "-p"] : ["run", "-c", "Release", "-p"]) : []).concat(extraArgs)
 		},
 		debug: { 
 			command: serverType == "command" ? serverPath : dotnetPath,
