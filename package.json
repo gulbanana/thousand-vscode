@@ -1,6 +1,6 @@
 {
 	"name": "thousand",
-	"version": "0.5.4",
+	"version": "0.5.5",
 	"publisher": "gulbanana",
 	"license": "GPL-3.0-or-later",
 	"displayName": "Thousand Words",
@@ -53,8 +53,8 @@
 	"contributes": {
 		"commands": [
 			{
-			"command": "thousand.beginPreview",
-			"title": "Thousand Words: Open Preview"
+				"command": "thousand.beginPreview",
+				"title": "Thousand Words: Open Preview"
 			}
 		],
 		"configuration": {
@@ -82,13 +82,20 @@
 					"scope": "window",
 					"type": "string",
 					"default": "thousand-server",
-					"description": "Override the default language server with your own copy."
+					"markdownDescription": "Override the default language server with your own copy. Only useful when `#thousand.client.serverType#` is not `internal`."
 				},
 				"thousand.client.serverType": {
 					"scope": "window",
 					"type": "string",
 					"default": "internal",
-					"description": "internal | project | assembly | command"
+					"description": "Select how to locate the language server, Thousand.LSP.",
+					"enum": ["internal", "command", "assembly", "project"],
+					"markdownEnumDescriptions":[
+						"Download and update the server automatically.",
+						"Execute a dotnet global tool or other command.",
+						"Use a DLL file at a path specified by `#thousand.client.serverPath#` (for custom installations).",
+						"Use a source code project at a path specified by `#thousand.client.serverPath#` (for debugging)."
+					]
 				},
 				"thousand.client.automaticPreview": {
 					"scope": "document",

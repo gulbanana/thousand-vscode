@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { LanguageClient, NotificationType } from "vscode-languageclient/node";
-import Preview from './Preview';
+import { LanguageClient, NotificationType, ProtocolRequestType, RequestType, RequestType0, RequestType1 } from "vscode-languageclient/node";
+import Preview, { ExportImageParams } from './Preview';
 
 interface UpdateParams {
 	uri: string;
@@ -11,12 +11,22 @@ interface BeginEndParams {
 	uri: string;
 }
 
+interface ExportRequest {
+    uri: string,
+    format: string
+}
+
+interface ExportResult {
+    filename: string
+}
+
 export async function initPreviewPane(context: vscode.ExtensionContext, client: LanguageClient, previewCommand: vscode.Disposable): Promise<void> {
     let previews = new Map<string, Preview>();
     let activePreview : Preview | undefined;
     let beginPreview = new NotificationType<BeginEndParams>("thousand/beginPreview");
     let endPreview = new NotificationType<BeginEndParams>("thousand/endPreview");
     let updatePreview = new NotificationType<UpdateParams>("thousand/updatePreview");
+    let exportImage = new RequestType<ExportRequest, ExportResult, string>("thousand/exportImage");
 
     // add new previews or update ones which aren't in the background, then suspend previewing if we close
     client.onNotification(updatePreview, ({uri, filename}) => {
@@ -101,13 +111,19 @@ export async function initPreviewPane(context: vscode.ExtensionContext, client: 
         }
     }));
 
-    // add a command to open previews explicitly
+    // add a command to open previews explicitly (or rather, replace the existing dummy command)
     previewCommand.dispose();
     context.subscriptions.push(vscode.commands.registerCommand("thousand.beginPreview", () => {
         let doc = vscode.window.activeTextEditor?.document;
         if (doc?.languageId == "thousand") {
             client.sendNotification(beginPreview, {uri: doc.uri.toString()});
         }
+    }));
+
+    // add a command to export from the preview to the filesystem
+    context.subscriptions.push(vscode.commands.registerCommand("thousand.export", async (params: ExportImageParams) => {
+        let result = await client.sendRequest(exportImage, {uri: params.uri.toString(), format: params.format});
+        vscode.window.showInformationMessage(result.filename);
     }));
 
     // upon load of the LSP, open previews for existing documents

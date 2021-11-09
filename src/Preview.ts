@@ -7,6 +7,11 @@ interface SymbolResult {
     path: number[];
 }
 
+export interface ExportImageParams {
+    uri: vscode.Uri,
+    format: "svg" | "png"
+}
+
 export default class Preview {
     uri: vscode.Uri;
     panel: vscode.WebviewPanel;
@@ -34,6 +39,7 @@ export default class Preview {
         }, {
             enableFindWidget: false,
             enableScripts: true,
+            enableCommandUris: true,
             localResourceRoots: [vscode.Uri.file(filepath.dir)]
         });
         this.panel.onDidDispose(disposeListener);
@@ -44,13 +50,23 @@ export default class Preview {
     }
 
     update(filename: string) {
-        if (filename.endsWith("svg")) {
-            let svg = readFileSync(filename);
-            this.body = `<body>${svg}</body></html>`;
-        } else {
-            let resourceUri = this.panel.webview.asWebviewUri(vscode.Uri.file(filename));
-            this.body = `<body><img src="${resourceUri}"></body></html>`;
-        }
+        let content = filename.endsWith("svg") ? readFileSync(filename) : `<img src="${this.panel.webview.asWebviewUri(vscode.Uri.file(filename))}">`;
+        let exportPNG : ExportImageParams = {
+            uri: this.uri,
+            format: "png"
+        };
+        let exportSVG : ExportImageParams = {
+            uri: this.uri,
+            format: "svg"
+        };
+
+        this.body = `<body>
+    <div style="height: 22px; display: flex; align-items: center; justify-content: flex-end; gap: 1em;">
+        <a href="command:thousand.export?${encodeURIComponent(JSON.stringify(exportSVG))}">Export SVG</a>
+        <a href="command:thousand.export?${encodeURIComponent(JSON.stringify(exportPNG))}">Export PNG</a>
+    </div>
+    ${content}
+</body></html>`;
         this.updateImpl();
     }
 
@@ -95,17 +111,23 @@ export default class Preview {
     }
 
     private updateImpl() {
-        let style = this.highlightClass == null ? "" : `<style type="text/css">
-    .${this.highlightClass} { 
-        filter: contrast(0.5); 
-    } 
-    .${this.highlightClass}[fill-opacity] { 
-        fill-opacity: 0.25; 
-    }
-</style>`;
+        let styles = this.highlightClass == null ? "" : `
+        .${this.highlightClass} { 
+            filter: contrast(0.5); 
+        } 
+        .${this.highlightClass}[fill-opacity] { 
+            fill-opacity: 0.25; 
+        }`;
 
         this.panel.webview.html = `<html>
-<head><title>${this.uri.path} ${this.seq++}</title>${style}</head>
+<head>
+    <title>${this.uri.path} ${this.seq++}</title>
+    <style type="text/css">
+        svg, img {
+            max-width: 100%;
+        }${styles}
+    </style>
+</head>
 ${this.body}
 </html>`;
     }
