@@ -1,5 +1,6 @@
+import { copyFile } from 'fs/promises';
 import * as vscode from 'vscode';
-import { LanguageClient, NotificationType, ProtocolRequestType, RequestType, RequestType0, RequestType1 } from "vscode-languageclient/node";
+import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient/node";
 import Preview, { ExportImageParams } from './Preview';
 
 interface UpdateParams {
@@ -17,7 +18,7 @@ interface ExportRequest {
 }
 
 interface ExportResult {
-    filename: string
+    filename: string | null
 }
 
 export async function initPreviewPane(context: vscode.ExtensionContext, client: LanguageClient, previewCommand: vscode.Disposable): Promise<void> {
@@ -123,7 +124,20 @@ export async function initPreviewPane(context: vscode.ExtensionContext, client: 
     // add a command to export from the preview to the filesystem
     context.subscriptions.push(vscode.commands.registerCommand("thousand.export", async (params: ExportImageParams) => {
         let result = await client.sendRequest(exportImage, {uri: params.uri.toString(), format: params.format});
-        vscode.window.showInformationMessage(result.filename);
+        if (result.filename == null) {
+            vscode.window.showErrorMessage("Diagram generation failed.");
+            return;
+        }
+
+        let loc = params.uri.path.endsWith(".1000") ? params.uri.path.slice(0, params.uri.path.length-5) : params.uri.path;
+        let output = await vscode.window.showSaveDialog({
+            filters: {[(params.format.toUpperCase() + " image")]: [params.format]},
+            defaultUri: params.uri.with({path: loc})
+        });
+        if (output)
+        {
+            await copyFile(result.filename, output.fsPath);
+        }
     }));
 
     // upon load of the LSP, open previews for existing documents
