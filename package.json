@@ -1,6 +1,6 @@
 {
 	"name": "thousand",
-	"version": "0.5.5",
+	"version": "0.5.6",
 	"publisher": "gulbanana",
 	"license": "GPL-3.0-or-later",
 	"displayName": "Thousand Words",
@@ -35,7 +35,7 @@
 	],
 	"scripts": {
 		"vscode:prepublish": "npm run esbuild-base -- --minify",
-		"esbuild-base": "dotnet publish -o out/tool src/tool && esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+		"esbuild-base": "dotnet publish -c Release -o out/tool src/tool && esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
 		"compile": "npm run esbuild-base -- --sourcemap",
 		"watch": "tsc -watch -p ./",
 		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
