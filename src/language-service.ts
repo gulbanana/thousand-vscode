@@ -30,7 +30,7 @@ export async function initLanguageService(context: vscode.ExtensionContext, outp
 	let serverPath = vscode.workspace.getConfiguration("thousand.client").get("serverPath", "thousand-server"); 
 
 	// acquire .NET
-	let acquisitionRequest: IDotnetAcquireContext =  { version: "5.0", requestingExtensionId: "gulbanana.thousand" };
+	let acquisitionRequest: IDotnetAcquireContext =  { version: "6.0", requestingExtensionId: "gulbanana.thousand" };
 	let acquisitionResult = await vscode.commands.executeCommand<IDotnetAcquireResult>('dotnet.acquire', acquisitionRequest);
 
 	let dotnetPath = acquisitionResult!.dotnetPath;
