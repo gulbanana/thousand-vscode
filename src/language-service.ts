@@ -7,8 +7,7 @@ import {
 	ServerOptions
 } from 'vscode-languageclient/node';
 import VFSProvider from './VFSProvider';
-import { exec, execFile } from 'child_process';
-import { stderr } from 'process';
+import { execFile } from 'child_process';
 
 enum AcquireErrorConfiguration {
     DisplayAllErrorPopups = 0,
@@ -30,8 +29,11 @@ export async function initLanguageService(context: vscode.ExtensionContext, outp
 	let serverPath = vscode.workspace.getConfiguration("thousand.client").get("serverPath", "thousand-server"); 
 
 	// acquire .NET
-	let acquisitionRequest: IDotnetAcquireContext =  { version: "6.0", requestingExtensionId: "gulbanana.thousand" };
-	let acquisitionResult = await vscode.commands.executeCommand<IDotnetAcquireResult>('dotnet.acquire', acquisitionRequest);
+	let acquisitionRequest: IDotnetAcquireContext = { version: "8.0", requestingExtensionId: "gulbanana.thousand" };
+	let acquisitionResult = await vscode.commands.executeCommand<IDotnetAcquireResult>("dotnet.acquireStatus", acquisitionRequest);
+	if (!acquisitionResult) {
+		acquisitionResult = await vscode.commands.executeCommand<IDotnetAcquireResult>("dotnet.acquire", acquisitionRequest);
+	}
 
 	let dotnetPath = acquisitionResult!.dotnetPath;
 	if (!dotnetPath) {

@@ -1,6 +1,6 @@
 {
 	"name": "thousand",
-	"version": "0.5.6",
+	"version": "0.5.8",
 	"publisher": "gulbanana",
 	"license": "GPL-3.0-or-later",
 	"displayName": "Thousand Words",
@@ -19,7 +19,7 @@
 		"vscode-languageclient": "^7.0.0"
 	},
 	"devDependencies": {
-		"@types/command-exists": "^1.2.0",
+		"@types/command-exists": "^1.2.3",
 		"@types/glob": "^7.1.4",
 		"@types/mocha": "^9.0.0",
 		"@types/node": "14.x",
@@ -89,8 +89,13 @@
 					"type": "string",
 					"default": "internal",
 					"description": "Select how to locate the language server, Thousand.LSP.",
-					"enum": ["internal", "command", "assembly", "project"],
-					"markdownEnumDescriptions":[
+					"enum": [
+						"internal",
+						"command",
+						"assembly",
+						"project"
+					],
+					"markdownEnumDescriptions": [
 						"Download and update the server automatically.",
 						"Execute a dotnet global tool or other command.",
 						"Use a DLL file at a path specified by `#thousand.client.serverPath#` (for custom installations).",
@@ -125,7 +130,7 @@
 		},
 		"configurationDefaults": {
 			"[thousand]": {
-				"editor.wordBasedSuggestions": false
+				"editor.wordBasedSuggestions": "off"
 			}
 		},
 		"languages": [
